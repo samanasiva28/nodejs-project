@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Product Details - SmartHome Hub</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen">
+
+  <nav class="bg-slate-800 border-b border-slate-700 px-6 py-4 flex justify-between items-center">
+    <a href="/" class="flex items-center space-x-2 text-blue-400 font-bold hover:underline">
+      ← Back to Appliances
+    </a>
+  </nav>
+
+  <main class="max-w-4xl mx-auto px-6 py-12">
+    <div id="product-container" class="bg-slate-800 border border-slate-700 rounded-2xl overflow-hidden shadow-2xl p-6 md:p-8">
+      <p class="text-slate-400">Loading product details...</p>
+    </div>
+  </main>
+
+  <script>
+    async function loadProductDetails() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const productId = urlParams.get('id');
+
+      if (!productId) {
+        document.getElementById('product-container').innerHTML = '<p class="text-red-400">No product specified.</p>';
+        return;
+      }
+
+      try {
+        const response = await fetch(`/api/appliances/${productId}`);
+        if (!response.ok) throw new Error("Product not found");
+        
+        const item = await response.json();
+        
+        document.getElementById('product-container').innerHTML = `
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+            <img src="${item.image}" alt="${item.name}" class="rounded-xl w-full h-80 object-cover border border-slate-700">
+            <div>
+              <span class="text-xs font-bold uppercase tracking-wider text-blue-400 px-2.5 py-1 bg-blue-500/10 rounded-full border border-blue-500/20">${item.category}</span>
+              <h1 class="text-3xl font-extrabold text-white mt-4">${item.name}</h1>
+              <p class="text-slate-300 mt-4 leading-relaxed">${item.description}</p>
+              
+              <div class="mt-6 space-y-3 border-t border-b border-slate-700 py-4">
+                <div class="flex justify-between text-sm">
+                  <span class="text-slate-400">Availability:</span>
+                  <span class="text-emerald-400 font-semibold">${item.status}</span>
+                </div>
+                <div class="flex justify-between text-sm">
+                  <span class="text-slate-400">Warranty:</span>
+                  <span class="text-slate-200">2 Years Manufacturer Warranty</span>
+                </div>
+              </div>
+
+              <div class="mt-6 flex items-center justify-between">
+                <div>
+                  <span class="text-xs text-slate-400 block">Total Price</span>
+                  <span class="text-3xl font-bold text-white">$${item.price}</span>
+                </div>
+                <button onclick="alert('Order inquiry placed!')" class="bg-blue-600 hover:bg-blue-500 text-white font-semibold px-6 py-3 rounded-xl transition shadow-lg">
+                  Order Now
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+      } catch (err) {
+        document.getElementById('product-container').innerHTML = 
+          `<p class="text-red-400">Error: ${err.message}</p>`;
+      }
+    }
+
+    loadProductDetails();
+  </script>
+</body>
+</html>
