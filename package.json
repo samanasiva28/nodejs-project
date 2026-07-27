@@ -1,0 +1,13 @@
+{
+  "name": "appliance-store-app",
+  "version": "1.0.0",
+  "description": "Smart Home Appliance Web App for EC2 Deployment",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.19.2"
+  }
+}
