@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Brand & Size Explorer - SmartHome Hub</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen">
+
+  <nav class="bg-slate-800 border-b border-slate-700 px-6 py-4 flex justify-between items-center">
+    <a href="/" class="flex items-center space-x-2 text-blue-400 font-bold hover:underline">
+      ← Back to Main Categories
+    </a>
+  </nav>
+
+  <header class="max-w-6xl mx-auto px-6 pt-8 pb-4">
+    <div id="category-header">
+      <p class="text-slate-400">Loading details...</p>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-6 pb-12">
+    <div id="products-list" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <p class="text-slate-400 col-span-full">Fetching popular brand models...</p>
+    </div>
+  </main>
+
+  <script>
+    async function loadCategoryProducts() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const categoryType = urlParams.get('type') || 'tv';
+
+      try {
+        const response = await fetch(`/api/category/${categoryType}`);
+        if (!response.ok) throw new Error("Category not found");
+
+        const data = await response.json();
+        const { metadata, products } = data;
+
+        // Render Header
+        document.getElementById('category-header').innerHTML = `
+          <div class="flex items-center space-x-3">
+            <span class="text-4xl">${metadata.icon}</span>
+            <div>
+              <h1 class="text-3xl font-extrabold text-white">${metadata.name} Catalog</h1>
+              <p class="text-slate-400 mt-1">Browse popular brands, available size options, and price ranges.</p>
+            </div>
+          </div>
+        `;
+
+        // Render Brands & Sizes
+        document.getElementById('products-list').innerHTML = products.map(item => `
+          <div class="bg-slate-800 border border-slate-700 rounded-2xl p-6 flex flex-col justify-between shadow-xl">
+            <div>
+              <div class="flex justify-between items-start">
+                <span class="text-xs font-bold uppercase tracking-widest text-blue-400 bg-blue-500/10 px-3 py-1 rounded-full border border-blue-500/20">${item.brand}</span>
+                <span class="text-amber-400 font-bold text-sm">${item.rating}</span>
+              </div>
+              
+              <h3 class="text-xl font-bold text-white mt-3">${item.name}</h3>
+              <p class="text-slate-400 text-xs mt-1 font-mono">${item.specs}</p>
+
+              <img src="${item.image}" alt="${item.name}" class="w-full h-48 object-cover rounded-xl mt-4 border border-slate-700">
+
+              <!-- Sizes Section -->
+              <div class="mt-5">
+                <span class="text-xs text-slate-400 uppercase font-semibold tracking-wider block mb-2">Available Size / Capacity Options:</span>
+                <div class="flex flex-wrap gap-2">
+                  ${item.sizes.map(size => `
+                    <span class="bg-slate-700 text-slate-200 text-xs font-semibold px-3 py-1.5 rounded-lg border border-slate-600">
+                      ${size}
+                    </span>
+                  `).join('')}
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-6 pt-4 border-t border-slate-700 flex justify-between items-center">
+              <div>
+                <span class="text-xs text-slate-400 block">Price Range</span>
+                <span class="text-2xl font-bold text-emerald-400">${item.priceRange}</span>
+              </div>
+              <button onclick="alert('Inquiry for ${item.brand} sent!')" class="bg-blue-600 hover:bg-blue-500 text-white font-semibold text-sm px-5 py-2.5 rounded-xl transition">
+                Check Availability
+              </button>
+            </div>
+          </div>
+        `).join('');
+
+      } catch (err) {
+        document.getElementById('products-list').innerHTML = 
+          `<p class="text-red-400 col-span-full">Error: ${err.message}</p>`;
+      }
+    }
+
+    loadCategoryProducts();
+  </script>
+</body>
+</html>
