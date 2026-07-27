@@ -3,11 +3,11 @@ FROM node:18-alpine AS base
 
 WORKDIR /app
 
-# Copy package files first to leverage Docker layer caching
+# Copy package files first
 COPY package*.json ./
 
-# Install production dependencies only
-RUN npm ci --only=production
+# Changed npm ci to npm install
+RUN npm install --omit=dev
 
 # Copy application source code and public assets
 COPY server.js ./
@@ -18,10 +18,10 @@ FROM node:18-alpine AS runner
 
 WORKDIR /app
 
-# Create a non-root user for improved security
+# Create a non-root user
 RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 
-# Copy built application from the base stage
+# Copy built application from base stage
 COPY --from=base /app /app
 
 USER appuser
