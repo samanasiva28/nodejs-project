@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SmartHome Appliances Hub</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen">
+
+  <!-- Navigation -->
+  <nav class="bg-slate-800 border-b border-slate-700 px-6 py-4 flex justify-between items-center">
+    <div class="flex items-center space-x-2">
+      <span class="text-2xl">⚡</span>
+      <h1 class="text-xl font-bold tracking-wide text-blue-400">SmartHome Hub</h1>
+    </div>
+    <span class="bg-emerald-500/10 text-emerald-400 text-xs px-3 py-1 rounded-full border border-emerald-500/20 font-mono">
+      EC2 Status: Active
+    </span>
+  </nav>
+
+  <!-- Hero Section -->
+  <header class="max-w-6xl mx-auto px-6 pt-10 pb-6">
+    <h2 class="text-3xl font-extrabold text-white">Home Appliances Store</h2>
+    <p class="text-slate-400 mt-1">Manage and browse smart devices connected to your infrastructure.</p>
+  </header>
+
+  <!-- Product Grid -->
+  <main class="max-w-6xl mx-auto px-6 pb-12">
+    <div id="products-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <p class="text-slate-400 col-span-full">Loading appliances from API...</p>
+    </div>
+  </main>
+
+  <script>
+    async function fetchAppliances() {
+      try {
+        const response = await fetch('/api/appliances');
+        const data = await response.json();
+        
+        const grid = document.getElementById('products-grid');
+        grid.innerHTML = data.map(item => `
+          <div class="bg-slate-800 border border-slate-700 rounded-xl overflow-hidden shadow-lg flex flex-col hover:border-slate-600 transition">
+            <img src="${item.image}" alt="${item.name}" class="h-48 w-full object-cover">
+            <div class="p-4 flex-1 flex flex-col justify-between">
+              <div>
+                <span class="text-xs font-semibold uppercase tracking-wider text-blue-400">${item.category}</span>
+                <h3 class="font-bold text-lg text-white mt-1">${item.name}</h3>
+                <p class="text-slate-400 text-xs mt-2 line-clamp-2">${item.description}</p>
+              </div>
+              <div class="mt-4 pt-3 border-t border-slate-700 flex justify-between items-center">
+                <span class="text-xl font-bold text-white">$${item.price}</span>
+                <span class="text-xs px-2 py-1 rounded bg-slate-700 text-slate-300 font-medium">${item.status}</span>
+              </div>
+            </div>
+          </div>
+        `).join('');
+      } catch (err) {
+        document.getElementById('products-grid').innerHTML = 
+          `<p class="text-red-400 col-span-full">Failed to connect to backend API: ${err.message}</p>`;
+      }
+    }
+
+    fetchAppliances();
+  </script>
+</body>
+</html>
