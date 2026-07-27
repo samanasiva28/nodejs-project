@@ -8,62 +8,59 @@
 </head>
 <body class="bg-slate-900 text-slate-100 min-h-screen">
 
-  <!-- Navigation -->
+  <!-- Navbar -->
   <nav class="bg-slate-800 border-b border-slate-700 px-6 py-4 flex justify-between items-center">
     <div class="flex items-center space-x-2">
       <span class="text-2xl">⚡</span>
-      <h1 class="text-xl font-bold tracking-wide text-blue-400">SmartHome Hub</h1>
+      <h1 class="text-xl font-bold text-blue-400">SmartHome Appliance Center</h1>
     </div>
     <span class="bg-emerald-500/10 text-emerald-400 text-xs px-3 py-1 rounded-full border border-emerald-500/20 font-mono">
-      EC2 Status: Active
+      Container Active
     </span>
   </nav>
 
-  <!-- Hero Section -->
+  <!-- Header -->
   <header class="max-w-6xl mx-auto px-6 pt-10 pb-6">
-    <h2 class="text-3xl font-extrabold text-white">Home Appliances Store</h2>
-    <p class="text-slate-400 mt-1">Click on any product image or card to view detailed specifications.</p>
+    <h2 class="text-3xl font-extrabold text-white">Select an Appliance Category</h2>
+    <p class="text-slate-400 mt-2">Click any appliance below to explore popular brands, sizes (inches, tons, watts), and prices.</p>
   </header>
 
-  <!-- Product Grid -->
+  <!-- Categories Grid -->
   <main class="max-w-6xl mx-auto px-6 pb-12">
-    <div id="products-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-      <p class="text-slate-400 col-span-full">Loading appliances...</p>
+    <div id="category-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <p class="text-slate-400 col-span-full">Loading appliance categories...</p>
     </div>
   </main>
 
   <script>
-    async function fetchAppliances() {
+    async function loadCategories() {
       try {
-        const response = await fetch('/api/appliances');
-        const data = await response.json();
+        const response = await fetch('/api/categories');
+        const categories = await response.json();
         
-        const grid = document.getElementById('products-grid');
-        grid.innerHTML = data.map(item => `
-          <a href="/product.html?id=${item.id}" class="group bg-slate-800 border border-slate-700 rounded-xl overflow-hidden shadow-lg flex flex-col hover:border-blue-500 transition cursor-pointer">
-            <div class="overflow-hidden h-48 w-full">
+        const grid = document.getElementById('category-grid');
+        grid.innerHTML = categories.map(item => `
+          <a href="/category.html?type=${item.id}" class="group bg-slate-800 border border-slate-700 rounded-2xl overflow-hidden shadow-lg hover:border-blue-500 transition duration-300 transform hover:-translate-y-1">
+            <div class="h-48 w-full overflow-hidden relative">
               <img src="${item.image}" alt="${item.name}" class="h-full w-full object-cover group-hover:scale-105 transition duration-300">
+              <span class="absolute top-3 right-3 bg-slate-900/80 backdrop-blur-md text-xl p-2 rounded-xl">${item.icon}</span>
             </div>
-            <div class="p-4 flex-1 flex flex-col justify-between">
-              <div>
-                <span class="text-xs font-semibold uppercase tracking-wider text-blue-400">${item.category}</span>
-                <h3 class="font-bold text-lg text-white mt-1 group-hover:text-blue-300 transition">${item.name}</h3>
-                <p class="text-slate-400 text-xs mt-2 line-clamp-2">${item.description}</p>
-              </div>
-              <div class="mt-4 pt-3 border-t border-slate-700 flex justify-between items-center">
-                <span class="text-xl font-bold text-white">$${item.price}</span>
-                <span class="text-xs px-2 py-1 rounded bg-slate-700 text-slate-300 font-medium">${item.status}</span>
+            <div class="p-5">
+              <h3 class="font-bold text-xl text-white group-hover:text-blue-400 transition">${item.name}</h3>
+              <p class="text-slate-400 text-sm mt-1">${item.count}</p>
+              <div class="mt-4 flex items-center text-blue-400 font-semibold text-sm">
+                Explore Brands & Sizes →
               </div>
             </div>
           </a>
         `).join('');
       } catch (err) {
-        document.getElementById('products-grid').innerHTML = 
-          `<p class="text-red-400 col-span-full">Failed to load appliances: ${err.message}</p>`;
+        document.getElementById('category-grid').innerHTML = 
+          `<p class="text-red-400 col-span-full">Failed to load categories: ${err.message}</p>`;
       }
     }
 
-    fetchAppliances();
+    loadCategories();
   </script>
 </body>
 </html>
