@@ -7,9 +7,11 @@ const PORT = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(express.json());
+
+// 1. Serve ALL static files from the 'public' folder first
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Updated Appliance Database with Smart TV included
+// Mock Database
 const appliances = [
   {
     id: 1,
@@ -49,12 +51,11 @@ const appliances = [
   }
 ];
 
-// API Routes
+// 2. API Routes
 app.get('/api/appliances', (req, res) => {
   res.json(appliances);
 });
 
-// Single Appliance Endpoint by ID
 app.get('/api/appliances/:id', (req, res) => {
   const item = appliances.find(a => a.id === parseInt(req.params.id));
   if (!item) return res.status(404).json({ error: "Product not found" });
@@ -65,8 +66,8 @@ app.get('/api/health', (req, res) => {
   res.json({ status: "UP", timestamp: new Date() });
 });
 
-// Serve static HTML files dynamically
-app.get('*', (req, res) => {
+// 3. Fallback Route: Direct unknown requests to index.html
+app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
